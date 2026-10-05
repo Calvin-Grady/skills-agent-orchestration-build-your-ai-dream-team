@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f7fb">
+    <meta name="description" content="A quick overview of team projects, ownership, status, and recent activity.">
+    <title>Project Pulse</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="dashboard">
+      <header class="dashboard-header">
+        <div class="heading-copy">
+          <p class="eyebrow">TEAM WORKSPACE</p>
+          <h1>Project Pulse</h1>
+          <p class="subtitle">A clear view of what’s moving, who’s involved, and where to focus next.</p>
+        </div>
+        <div class="updated-note" aria-label="Project overview">PROJECT OVERVIEW</div>
+      </header>
+
+      <section class="overview" aria-labelledby="projects-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">YOUR PORTFOLIO</p>
+            <h2 id="projects-heading">Projects</h2>
+          </div>
+          <p id="project-count" class="project-count" aria-live="polite"></p>
+        </div>
+        <p id="load-status" class="load-status" role="status">Loading project updates…</p>
+        <div id="project-list" class="project-list" aria-live="polite"></div>
+      </section>
+
+      <footer class="dashboard-footer">
+        <span class="footer-mark" aria-hidden="true">P</span>
+        <span>Project Pulse <span class="footer-divider">/</span> Team snapshot</span>
+      </footer>
+    </main>
+      <script>
+        const projectList = document.querySelector("#project-list");
+        const loadStatus = document.querySelector("#load-status");
+        const projectCount = document.querySelector("#project-count");
+
+        const allowedStatuses = new Set(["On track", "At risk", "Blocked", "Planning"]);
+        const allowedPriorities = new Set(["High", "Medium", "Low"]);
+
+        function addText(parent, tagName, className, text) {
+          const element = document.createElement(tagName);
+          if (className) element.className = className;
+          element.textContent = text;
+          parent.append(element);
+          return element;
+        }
+
+        function createProjectCard(project) {
+          const article = document.createElement("article");
+          article.className = "project-card";
+
+          const cardHeader = document.createElement("div");
+          cardHeader.className = "card-header";
+          const identity = document.createElement("div");
+          identity.className = "project-identity";
+          addText(identity, "h3", "project-name", project.name);
+          addText(identity, "p", "project-owner", `Owned by ${project.owner}`);
+          cardHeader.append(identity);
+
+          const statusClass = allowedStatuses.has(project.status)
+            ? project.status.toLowerCase().replaceAll(" ", "-")
+            : "unknown";
+          const status = addText(cardHeader, "span", `status-badge status-${statusClass}`, project.status);
+          status.setAttribute("aria-label", `Status: ${project.status}`);
+          article.append(cardHeader);
+
+          const activity = document.createElement("div");
+          activity.className = "activity";
+          addText(activity, "p", "field-label", "RECENT ACTIVITY");
+          addText(activity, "p", "activity-copy", project.recentActivity);
+          article.append(activity);
+
+          const cardFooter = document.createElement("div");
+          cardFooter.className = "card-footer";
+          addText(cardFooter, "span", "field-label", "PRIORITY");
+          const priorityClass = allowedPriorities.has(project.priority)
+            ? project.priority.toLowerCase()
+            : "unknown";
+          const priority = addText(cardFooter, "span", `priority priority-${priorityClass}`, project.priority);
+          priority.setAttribute("aria-label", `Priority: ${project.priority}`);
+          article.append(cardFooter);
+
+          return article;
+        }
+
+        function isProject(project) {
+          return project && ["name", "owner", "status", "recentActivity", "priority"]
+            .every((field) => typeof project[field] === "string" && project[field].trim());
+        }
+
+        async function loadProjects() {
+          try {
+            const response = await fetch("project-data.json");
+            if (!response.ok) {
+              throw new Error(`Project data request failed with status ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data || !Array.isArray(data.projects)) {
+              throw new Error("Project data must contain a projects array");
+            }
+
+            const projects = data.projects.filter(isProject);
+            if (projects.length !== data.projects.length) {
+              throw new Error("Project data contains an entry with missing or invalid fields");
+            }
+
+            projectCount.textContent = `${projects.length} ${projects.length === 1 ? "project" : "projects"}`;
+            if (projects.length === 0) {
+              loadStatus.textContent = "There are no projects to show yet.";
+              loadStatus.classList.add("empty-state");
+              return;
+            }
+
+            const cards = document.createDocumentFragment();
+            projects.forEach((project) => cards.append(createProjectCard(project)));
+            projectList.append(cards);
+            loadStatus.remove();
+          } catch (error) {
+            console.error("Unable to load Project Pulse data:", error);
+            loadStatus.textContent = "Project updates couldn’t be loaded. Check the project data and refresh the page.";
+            loadStatus.classList.add("error-state");
+          }
+        }
+
+        loadProjects();
+      </script>
+  </body>
+</html>

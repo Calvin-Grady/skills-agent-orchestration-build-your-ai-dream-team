@@ -1,0 +1,32 @@
+{
+  "projects": [
+    {
+      "name": "Atlas Design System",
+      "owner": "Maya Chen",
+      "status": "On track",
+      "recentActivity": "Published the updated component guidance and started accessibility reviews.",
+      "priority": "High"
+    },
+    {
+      "name": "Customer Insights",
+      "owner": "Jordan Lee",
+      "status": "At risk",
+      "recentActivity": "Research synthesis is underway; the final interview is scheduled for Thursday.",
+      "priority": "High"
+    },
+    {
+      "name": "Mobile Onboarding",
+      "owner": "Sam Rivera",
+      "status": "On track",
+      "recentActivity": "The first-run flow is ready for a small internal usability test.",
+      "priority": "Medium"
+    },
+    {
+      "name": "Partner API",
+      "owner": "Alex Morgan",
+      "status": "Planning",
+      "recentActivity": "Scoping the next integration milestone with partner teams.",
+      "priority": "Low"
+    }
+  ]
+}

@@ -10,3 +10,6 @@ Remember, it's self-paced so feel free to take a break! ☕️
 
 [![](https://img.shields.io/badge/Go%20to%20Exercise-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/Calvin-Grady/skills-agent-orchestration-build-your-ai-dream-team/issues/1)
 
+# Project Pulse
+
+Project Pulse is a dashboard built using the agent orchestration exercise.
